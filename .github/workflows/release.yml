@@ -3,6 +3,9 @@ on:
   push:
     tags:
       - 'v*'
+env:
+  GOARCH: amd64
+  GOOS: linux
 jobs:
   build:
     name: Build
@@ -23,7 +26,7 @@ jobs:
 
     - name: Archive the artifacts
       run: |
-        tar -czf golang-actions-practice.tar.gz LICENSE README golang-actions-practice
+        tar -czf artifacts.tar.gz LICENSE README golang-actions-practice
 
     - name: Create Release
       id: create_release
@@ -42,6 +45,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./golang-actions-practice.tar.gz
-        asset_name: golang-actions-practice.tar.gz
+        asset_path: ./artifacts.tar.gz
+        asset_name: golang-actions-practice_${{ github.ref }}_${{ env.GOOS }}_${{ env.GOARCH }}.tar.gz
         asset_content_type: application/gzip
