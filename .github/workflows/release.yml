@@ -36,7 +36,10 @@ jobs:
 
     - name: Get version
       id: get_version
-      run: echo ::set-output name=version::$(basename ${{ github.ref }})
+      run: |
+        echo ::set-env name=VERSION::$(basename ${{ github.ref }})
+        echo ::set-output name=version::${VERSION}
+        echo ::set-output name=prerelease::$(case ${VERSION} in *-*) echo true ;; *) echo false; esac)
 
     - name: Create Release
       id: create_release
@@ -47,7 +50,7 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
         draft: false
-        prerelease: false
+        prerelease: ${{ steps.get_version.outputs.prerelease }}
 
     - name: Upload the release asset
       uses: actions/upload-release-asset@v1
