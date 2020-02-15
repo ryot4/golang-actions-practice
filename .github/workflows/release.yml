@@ -25,21 +25,22 @@ jobs:
       env:
         CGO_ENABLED: 0
 
-    - name: Get version
-      id: get_version
+    - name: Check the release version
+      id: check_version
       run: |
         VERSION=$(basename ${{ github.ref }})
         echo ::set-output name=version::${VERSION}
         echo ::set-output name=prerelease::$(case ${VERSION} in *-*) echo true ;; *) echo false; esac)
 
     - name: Archive the artifacts
-      run: >
-        tar -czf
-        golang-actions-practice_${{ steps.get_version.outputs.version }}_${{ env.GOOS }}_${{ env.GOARCH }}.tar.gz
-        LICENSE README golang-actions-practice
-
-    - name: sha256sums
-      run: sha256sum *.tar.gz > sha256sums.txt
+      id: archive
+      run: |
+        ARCHIVE=golang-actions-practice_${{ steps.check_version.outputs.version }}_${{ env.GOOS }}_${{ env.GOARCH }}.tar.gz
+        SHA256SUM=${ARCHIVE%%.tar.gz}.sha256sum
+        tar -czf ${ARCHIVE} LICENSE README golang-actions-practice
+        sha256sum ${ARCHIVE} > ${SHA256SUM}
+        echo ::set-output name=archive::${ARCHIVE}
+        echo ::set-output name=sha256sum::${SHA256SUM}
 
     - name: Create Release
       id: create_release
@@ -50,7 +51,7 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: ${{ github.ref }}
         draft: false
-        prerelease: ${{ steps.get_version.outputs.prerelease }}
+        prerelease: ${{ steps.check_version.outputs.prerelease }}
 
     - name: Upload the release asset
       uses: actions/upload-release-asset@v1
@@ -58,8 +59,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts.tar.gz
-        asset_name: golang-actions-practice_${{ steps.get_version.outputs.version }}_${{ env.GOOS }}_${{ env.GOARCH }}.tar.gz
+        asset_path: ${{ steps.archive.outputs.archive }}
+        asset_name: ${{ steps.archive.outputs.archive }}
         asset_content_type: application/gzip
 
     - name: Upload sha256sums.txt
@@ -68,6 +69,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./sha256sums.txt
-        asset_name: golang-actions-practice_${{ steps.get_version.outputs.version }}_sha256sums.txt
+        asset_path: ${{ steps.archive.outputs.sha256sum }}
+        asset_name: ${{ steps.archive.outputs.sha256sum }}
         asset_content_type: text/plain
