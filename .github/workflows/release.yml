@@ -4,7 +4,7 @@ on:
     tags:
       - 'v*.*.*'
 env:
-  GO111MODULES=on
+  GO111MODULES: on
   GOARCH: amd64
   GOOS: linux
 jobs:
