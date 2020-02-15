@@ -19,6 +19,12 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
+    - name: Debug
+      run: |
+        pwd
+        ls -l
+        env
+
     - name: Build the release binary
       run: go build -ldflags '-s -w' -trimpath
       env:
