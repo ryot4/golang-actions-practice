@@ -34,6 +34,9 @@ jobs:
     - name: Archive the artifacts
       run: tar -czf artifacts.tar.gz LICENSE README golang-actions-practice
 
+    - name: sha256sums
+      run: sha256sum *.tar.gz > sha256sums.txt
+
     - name: Get version
       id: get_version
       run: |
@@ -61,3 +64,13 @@ jobs:
         asset_path: ./artifacts.tar.gz
         asset_name: golang-actions-practice_${{ steps.get_version.outputs.version }}_${{ env.GOOS }}_${{ env.GOARCH }}.tar.gz
         asset_content_type: application/gzip
+
+    - name: Upload sha256sums.txt
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./sha256sums.txt
+        asset_name: golang-actions-practice_${{ steps.get_version.outputs.version }}_sha256sums.txt
+        asset_content_type: text/plain
