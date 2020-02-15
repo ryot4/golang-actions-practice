@@ -19,7 +19,7 @@ jobs:
     - name: Build the release binary
       run: go build -ldflags '-s -w' -trimpath
       env:
-        CGO_ENABLED=0
+        CGO_ENABLED: 0
 
     - name: Archive the artifacts
       run: |
