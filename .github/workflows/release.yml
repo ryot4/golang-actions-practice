@@ -37,7 +37,7 @@ jobs:
     - name: Get version
       id: get_version
       run: |
-        echo ::set-env name=VERSION::$(basename ${{ github.ref }})
+        VERSION=$(basename ${{ github.ref }})
         echo ::set-output name=version::${VERSION}
         echo ::set-output name=prerelease::$(case ${VERSION} in *-*) echo true ;; *) echo false; esac)
 
