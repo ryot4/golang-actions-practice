@@ -20,6 +20,17 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
+    - name: Include the license of Go in LICENSE for binary distribution
+      run: |
+        cat >> LICENSE <<EOS
+
+
+        The binary distribution of golang-actions-practice includes the Go runtime and
+        the standard library, which are distributed under the following license:
+
+        EOS
+        curl -s -L https://golang.org/LICENSE?m=text >> LICENSE
+
     - name: Build the release binary
       run: go build -ldflags '-s -w' -trimpath
       env:
