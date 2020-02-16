@@ -25,8 +25,8 @@ jobs:
         cat >> LICENSE <<EOS
 
 
-        The binary distribution of golang-actions-practice includes the Go runtime and
-        the standard library, which are distributed under the following license:
+        The executable includes the Go runtime and the standard library, which are
+        distributed under the following license:
 
         EOS
         curl -s -L https://golang.org/LICENSE?m=text >> LICENSE
